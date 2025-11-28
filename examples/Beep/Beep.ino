@@ -18,7 +18,7 @@ const int BUZZER_PIN = 3;
 
 int lastButtonState = HIGH; // the previous state from the input pin
 
-ezBuzzer buzzer(BUZZER_PIN); // create ezBuzzer object that attach to a pin;
+ezBuzzer buzzer(BUZZER_PIN, BUZZER_TYPE_ACTIVE, HIGH); // create ezBuzzer object: pin, type, activeLevel
 
 void setup() {
   Serial.begin(9600);

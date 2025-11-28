@@ -31,9 +31,12 @@
 
 #include <ezBuzzer.h>
 
-ezBuzzer::ezBuzzer(int pin) {
+ezBuzzer::ezBuzzer(int pin, int buzzerType, int activeLevel) {
 	_buzzerPin   = pin;
 	_buzzerState = BUZZER_IDLE;
+	_activeLevel = activeLevel;  // Store active level (HIGH or LOW)
+	_buzzerType  = buzzerType;   // Store buzzer type (ACTIVE or PASSIVE)
+	_beepFrequency = 2000;  // Default 2000 Hz for passive buzzer beep
 
 	_delayTime = 0;
 	_beepTime  = 0;
@@ -47,14 +50,36 @@ ezBuzzer::ezBuzzer(int pin) {
 	_notePauseTime = 0;
 
 	pinMode(_buzzerPin, OUTPUT);
+	digitalWrite(_buzzerPin, !_activeLevel);  // Set to inactive level (turn OFF)
 }
 
+void ezBuzzer::setBuzzerType(int type) {
+	_buzzerType = type;
+}
+
+void ezBuzzer::setBeepFrequency(int frequency) {
+	_beepFrequency = frequency;
+}
 
 void ezBuzzer::stop(void){
 	noTone(_buzzerPin);
-	digitalWrite(_buzzerPin, LOW);
+	digitalWrite(_buzzerPin, !_activeLevel);  // Set to inactive level (turn OFF)
 
 	_buzzerState = BUZZER_IDLE;
+}
+
+void ezBuzzer::turnON(void){
+	_buzzerState = BUZZER_IDLE;  // Cancel any ongoing beep/melody
+	
+	if (_buzzerType == BUZZER_TYPE_PASSIVE) {
+		tone(_buzzerPin, _beepFrequency);  // Start tone with default frequency
+	} else {
+		digitalWrite(_buzzerPin, _activeLevel);  // Set to active level (turn ON)
+	}
+}
+
+void ezBuzzer::turnOFF(void){
+	stop();  // Same as stop
 }
 
 void ezBuzzer::beep(unsigned long beepTime) {
@@ -62,8 +87,13 @@ void ezBuzzer::beep(unsigned long beepTime) {
 }
 
 void ezBuzzer::beep(unsigned long beepTime, unsigned long delay) {
+	beep(beepTime, delay, _beepFrequency);
+}
+
+void ezBuzzer::beep(unsigned long beepTime, unsigned long delay, int frequency) {
 	_delayTime = delay;
 	_beepTime  = beepTime;
+	_beepFrequency = frequency;
 	_buzzerState = BUZZER_BEEP_DELAY;
 	_startTime = millis();
 }
@@ -94,7 +124,11 @@ void ezBuzzer::loop(void) {
 				_buzzerState = BUZZER_BEEPING;
 				_startTime = millis();
 
-				digitalWrite(_buzzerPin, HIGH);
+				if (_buzzerType == BUZZER_TYPE_PASSIVE) {
+					tone(_buzzerPin, _beepFrequency);  // Use tone() for passive buzzer
+				} else {
+					digitalWrite(_buzzerPin, _activeLevel);  // Set to active level (turn ON) for active buzzer
+				}
 			}
 
 			break;
@@ -102,7 +136,12 @@ void ezBuzzer::loop(void) {
 		case BUZZER_BEEPING:
 			if ((unsigned long)(millis() - _startTime) >= _beepTime) {
 				_buzzerState = BUZZER_IDLE;
-				digitalWrite(_buzzerPin, LOW);
+				
+				if (_buzzerType == BUZZER_TYPE_PASSIVE) {
+					noTone(_buzzerPin);  // Stop tone for passive buzzer
+				} else {
+					digitalWrite(_buzzerPin, !_activeLevel);  // Set to inactive level (turn OFF) for active buzzer
+				}
 			}
 
 			break;

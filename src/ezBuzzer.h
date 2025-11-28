@@ -133,11 +133,17 @@
 #define BUZZER_BEEPING    2
 #define BUZZER_MELODY     3
 
+#define BUZZER_TYPE_ACTIVE  0
+#define BUZZER_TYPE_PASSIVE 1
+
 class ezBuzzer
 {
 	private:
 		int _buzzerPin;
 		int _buzzerState;
+		int _activeLevel;  // HIGH or LOW - what level makes buzzer sound
+		int _buzzerType;   // ACTIVE or PASSIVE
+		int _beepFrequency; // Frequency for passive buzzer beep (default 2000 Hz)
 
 		unsigned long _delayTime;
 		unsigned long _beepTime;
@@ -151,10 +157,15 @@ class ezBuzzer
 		unsigned long _notePauseTime;
 
 	public:
-		ezBuzzer(int pin);
+		ezBuzzer(int pin, int buzzerType = BUZZER_TYPE_ACTIVE, int activeLevel = HIGH);
+		void setBuzzerType(int type);  // Set BUZZER_TYPE_ACTIVE or BUZZER_TYPE_PASSIVE
+		void setBeepFrequency(int frequency);  // Set frequency for passive buzzer beep (default 2000 Hz)
 		void stop(void);
+		void turnON(void);   // Turn buzzer ON (for ACTIVE buzzer) or start tone (for PASSIVE buzzer)
+		void turnOFF(void);  // Turn buzzer OFF (same as stop)
 		void beep(unsigned long beepTime);
 		void beep(unsigned long beepTime, unsigned long delay);
+		void beep(unsigned long beepTime, unsigned long delay, int frequency);  // For passive buzzer with custom frequency
 		void playMelody(int *melody, int *noteDurations, int length);
 
 		int getState(void);

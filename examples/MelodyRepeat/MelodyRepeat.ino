@@ -16,7 +16,7 @@
 
 const int BUZZER_PIN = 3;
 
-ezBuzzer buzzer(BUZZER_PIN); // create ezBuzzer object that attach to a pin;
+ezBuzzer buzzer(BUZZER_PIN, BUZZER_TYPE_PASSIVE, HIGH); // create ezBuzzer object: pin, type, activeLevel (PASSIVE for melody)
 
 // notes in the melody:
 int melody[] = {
