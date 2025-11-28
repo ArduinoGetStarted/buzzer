@@ -17,10 +17,18 @@ stop	KEYWORD2
 beep	KEYWORD2
 playMelody	KEYWORD2
 getState	KEYWORD2
+turnON	KEYWORD2
+turnOFF	KEYWORD2
+setBuzzerType	KEYWORD2
+setBeepFrequency	KEYWORD2
+loop	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
 #######################################
+
+BUZZER_TYPE_ACTIVE	LITERAL1
+BUZZER_TYPE_PASSIVE	LITERAL1
 
 NOTE_B0	LITERAL1
 NOTE_C1	LITERAL1
